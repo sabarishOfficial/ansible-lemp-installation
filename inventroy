@@ -1,0 +1,1 @@
+server ansible_host=IPADDRESS ansible_user=LINUX_USER_NAME ansible_ssh_private_key_file=example.pem

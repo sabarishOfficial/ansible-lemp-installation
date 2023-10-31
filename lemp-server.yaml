@@ -1,0 +1,5 @@
+- name: lemp-installation
+  hosts: '*'
+  become: yes
+  roles:
+    - lemp-server

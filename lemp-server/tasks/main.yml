@@ -1,0 +1,110 @@
+---
+# tasks file for lemp-server
+# update the server
+- name: update
+  apt:
+    update_cache: yes
+    upgrade: yes
+# php dependencies
+- name: software-properties
+  apt:
+    name: software-properties-common
+    state: present
+- name: add-apt-repo
+  apt_repository:
+    repo: ppa:ondrej/php
+    state: present
+# lemp installation
+- name: lemp-depends-installations
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ lemp }}"
+# php extension installation
+- name: php-extension-installations
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ php_extensions }}"
+# lemp server start
+- name: server start and enable
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  with_items:
+    - "{{ server }}"
+# mysql client install for ansible access the mysql
+- name: mysql-client
+  apt:
+    name: python3-mysqldb
+    state: present
+# remove anonymous user
+- name: remove anonymous user
+  mysql_user:
+    name: "{{ anonymous }}"
+    state: absent
+# create the database
+- name: database create
+  mysql_db:
+    name: "{{ databaseName }}"
+    state: present
+# create user
+- name: create user
+  mysql_user:
+    name: "{{ userName }}"
+    password: "{{ passWord }}"
+    host: "{{ item }}"
+    state: present
+  with_items:
+    - "{{ mysql_hosts }}"
+# database access to the user
+- name: database get privileges for user
+  mysql_user:
+    name: "{{ userName }}"
+    password: "{{ passWord }}"
+    state: present
+    host: "{{ item }}"
+    priv: "{{ databaseName }}.*: ALL,GRANT"
+  with_items:
+    - "{{ mysql_hosts }}"
+# phpmyadmin download
+- name: phpmyadmin download
+  unarchive:
+    src: "{{ phpmyadmin_url }}"
+    dest: "{{ phpmyadmin_dest }}"
+    remote_src: true
+# change folder name
+- name: folder rename
+  command: "{{ phpmyadmin_mv_file }}"
+  ignore_errors: true
+# nginx working dir
+- name: working directory
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ nginx_working_dir }}"
+# configuration rename
+- name: configuration file rename
+  command: "{{ phpmyadmin_config }}"
+# unlink default configuration
+- name: unlink default configuration
+  file:
+    path: "{{ nginx.enable }}default"
+    state: absent
+# configuration move to the server
+- name: server configuration copy
+  template:
+    src: server.conf
+    dest: "{{ nginx.available }}server.conf"
+# create symlink in server configurations
+- name: Create symlink nginx vhost
+  file:
+    src: "{{ nginx.available }}server.conf"
+    dest: "{{ nginx.enable }}server.conf"
+    state: link
+  notify:
+    - nginx-service

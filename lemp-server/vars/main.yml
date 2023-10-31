@@ -1,0 +1,51 @@
+---
+# vars file for lemp-server
+lemp:
+  - nginx
+  - php8.2
+  - mysql-server
+  - mysql-client
+
+# php extension variables
+php_extensions:
+  - php8.2-cli
+  - php8.2-common
+  - php8.2-fpm
+  - php8.2-mysql
+  - php8.2-zip
+  - php8.2-gd
+  - php8.2-mbstring
+  - php8.2-curl
+  - php8.2-xml
+  - php8.2-bcmath
+
+# lemp variables
+server:
+  - nginx
+  - php8.2-fpm
+  - mysql
+#mysqlDatabase variables
+anonymous: ""
+userName: sivasabarish
+passWord: Z1hgawcl#
+databaseName: siva
+mysql_hosts:
+  - "localhost"
+  - "%"
+  - "127.0.0.1"
+
+# phpmyadmin variables
+phpmyadmin_dest: /usr/share/
+phpmyadmin_url: https://files.phpmyadmin.net/phpMyAdmin/5.2.1/phpMyAdmin-5.2.1-all-languages.tar.gz
+
+phpmyadmin_mv_file: sudo mv /usr/share/phpMyAdmin-5.2.1-all-languages /usr/share/phpmyadmin
+phpmyadmin_config: sudo cp -r /usr/share/phpmyadmin/config.sample.inc.php /usr/share/phpmyadmin/config.inc.php
+
+# nginx variables
+nginx:
+  available: /etc/nginx/sites-available/
+  enable: /etc/nginx/sites-enabled/
+
+nginx_working_dir:
+  - /var/www/html/frontend
+  - /var/www/html/backend
