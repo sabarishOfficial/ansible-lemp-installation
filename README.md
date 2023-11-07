@@ -51,8 +51,10 @@ Clone the Repository:
 git clone https://github.com/sabarishOfficial/ansible-lemp-installation.git
 cd ansible-lemp-installation
 ```
-### Nginx Configurations
-Below is an example Nginx server block configuration catering to React and Django use cases. If you need to customize your configuration, modify the server.conf file in the templates directory.
+# Nginx Configurations
+## NGINX Configuration for React, Django, and Laravel Projects
+
+Below is the NGINX configuration that can be utilized for React, Django, and Laravel projects. This configuration is designed to be added to the template directory file, allowing you to choose the specific configuration you need. Please add the required configuration to your task directory's main.yaml file.
 ```bash
 # Nginx Server Block Configuration
 server {
@@ -121,6 +123,48 @@ server {
             proxy_read_timeout 600s;
         }
     }
+}
+```
+```bash
+server {
+    server_name _;
+
+    root /usr/share/nginx/university/;
+    index index.php index.html;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+        add_header 'Access-Control-Allow-Origin' '*' always;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        add_header 'Content-Security-Policy' 'upgrade-insecure-requests';
+    }
+
+    location ~ ^/(.+\.php)$ {
+        root /usr/share/nginx/html/university/$1;
+        fastcgi_pass   unix:/run/php-fpm/www.sock;
+        fastcgi_index  index.php;
+        fastcgi_param  SCRIPT_FILENAME  $request_filename;
+        include fastcgi_params;
+    }
+    location /phpmyadmin {
+        root /usr/share/;
+        proxy_read_timeout 600s;
+        index index.php;
+        try_files $uri $uri/ =404;
+
+        location ~ ^/phpmyadmin/(doc|sql|setup)/ {
+                deny all;
+        }
+
+        location ~ /phpmyadmin/(.+\.php)$ {
+            fastcgi_pass unix:/run/php/php8.2-fpm.sock;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            include fastcgi.conf;
+            include snippets/fastcgi-php.conf;
+            proxy_read_timeout 600s;
+        }
+    }
+
 }
 ```
 ## Configure Inventory:
