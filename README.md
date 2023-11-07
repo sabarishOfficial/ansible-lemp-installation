@@ -125,11 +125,12 @@ server {
     }
 }
 ```
+Laravel Nginx Configuration
 ```bash
 server {
     server_name _;
 
-    root /usr/share/nginx/university/;
+    root /var/www/html/frontend/public;
     index index.php index.html;
 
     location / {
@@ -140,8 +141,8 @@ server {
     }
 
     location ~ ^/(.+\.php)$ {
-        root /usr/share/nginx/html/university/$1;
-        fastcgi_pass   unix:/run/php-fpm/www.sock;
+        root /var/www/html/frontend/public/$1;
+        fastcgi_pass   unix:/run/php/php8.2-fpm.sock;;
         fastcgi_index  index.php;
         fastcgi_param  SCRIPT_FILENAME  $request_filename;
         include fastcgi_params;
